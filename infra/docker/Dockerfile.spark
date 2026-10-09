@@ -1,0 +1,27 @@
+# Dev/runtime image for ingestion, PySpark jobs and tests (Modules 1, 2, 6).
+# Spark runs in local mode inside this container; see docs/decisions.md for why.
+FROM python:3.11-slim-bookworm
+
+ARG POSTGRES_JDBC_VERSION=42.7.4
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+    DATA_DIR=/app/data
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openjdk-17-jre-headless curl procps \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY infra/docker/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# JDBC driver so Spark can write to the Postgres warehouse without downloading at runtime
+RUN SPARK_JARS="$(python -c 'import pyspark, os; print(os.path.join(os.path.dirname(pyspark.__file__), "jars"))')" \
+    && curl -fsSL -o "$SPARK_JARS/postgresql-${POSTGRES_JDBC_VERSION}.jar" \
+       "https://repo1.maven.org/maven2/org/postgresql/postgresql/${POSTGRES_JDBC_VERSION}/postgresql-${POSTGRES_JDBC_VERSION}.jar"
+
+WORKDIR /app
+EXPOSE 4040
+CMD ["sleep", "infinity"]

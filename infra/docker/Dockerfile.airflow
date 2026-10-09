@@ -1,0 +1,30 @@
+# Airflow image with Java + PySpark (spark jobs run as tasks) and dbt (Modules 3, 4).
+ARG AIRFLOW_VERSION=2.10.5
+FROM apache/airflow:${AIRFLOW_VERSION}-python3.11
+
+ARG AIRFLOW_VERSION=2.10.5
+ARG POSTGRES_JDBC_VERSION=42.7.4
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openjdk-17-jre-headless curl \
+    && rm -rf /var/lib/apt/lists/*
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+USER airflow
+ENV PYTHONPATH=/app \
+    DATA_DIR=/app/data \
+    DBT_PROFILES_DIR=/app/dbt \
+    DBT_BIN=/home/airflow/dbt-venv/bin/dbt
+
+COPY infra/docker/requirements-airflow.txt /tmp/requirements-airflow.txt
+RUN pip install --no-cache-dir -r /tmp/requirements-airflow.txt \
+    -c "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-3.11.txt"
+
+# dbt lives in its own venv: its dependencies conflict with Airflow's pinned ones
+RUN python -m venv /home/airflow/dbt-venv \
+    && /home/airflow/dbt-venv/bin/pip install --no-cache-dir dbt-postgres==1.8.2
+
+RUN SPARK_JARS="$(python -c 'import pyspark, os; print(os.path.join(os.path.dirname(pyspark.__file__), "jars"))')" \
+    && curl -fsSL -o "$SPARK_JARS/postgresql-${POSTGRES_JDBC_VERSION}.jar" \
+       "https://repo1.maven.org/maven2/org/postgresql/postgresql/${POSTGRES_JDBC_VERSION}/postgresql-${POSTGRES_JDBC_VERSION}.jar"

@@ -1,0 +1,7 @@
+# Installed on top of Airflow with its constraints file, so versions
+# of shared libs (pandas, pyarrow, ...) are resolved by Airflow, not pinned here.
+pyspark==3.5.3
+pyarrow
+pandas
+faker
+psycopg2-binary
