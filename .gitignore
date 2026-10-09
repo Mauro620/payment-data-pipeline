@@ -1,0 +1,41 @@
+# Secrets — never commit real credentials
+.env
+*.pem
+.aws/
+
+# Generated data (regenerate with the ingestion module)
+data/
+*.parquet
+*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Airflow
+airflow/logs/
+airflow/plugins/__pycache__/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
