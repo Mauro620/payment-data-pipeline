@@ -1,6 +1,6 @@
 # Plan de aprendizaje
 
-La versión completa (preguntas de concepto, ejercicios con evidencia y preguntas de entrevista por módulo) vive en Notion, en la página **payment-data-pipeline** de la base de Proyectos. Este archivo es el resumen para tenerlo a mano en el repo.
+La versión completa (preguntas de concepto, ejercicios con evidencia y preguntas de entrevista por módulo) vive en Notion, en la página **payment-data-pipeline** de la base de Proyectos. Este archivo es el resumen para tenerlo a mano en el repo. La ruta paso a paso está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Mentalidad
 
